@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package scg.v1.services.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto"; // For flexible, arbitrary JSON-like data.
+
+option go_package = "github.com/SupplyChainGuard/scg-protos/protoc-gen/go/v1/services;services";
+
+// IngestionService is the primary public-facing service for ingesting all
+// supply chain events into the SupplyChainGuard platform.
+service IngestionService {
+  // IngestEvent is a robust endpoint for accepting a detailed supply chain event.
+  // It is designed to be called by customer ERPs, SCM systems, or IoT platforms.
+  rpc IngestEvent(IngestEventRequest) returns (IngestEventResponse);
+}
+
+// ===================================================================
+//  Request & Response Messages
+// ===================================================================
+
+message IngestEventRequest {
+  // --- Metadata ---
+  // A unique identifier for this specific request, for idempotency.
+  // The client should generate this (e.g., a UUID). If the same request_id
+  // is seen twice, the system can safely ignore the second one.
+  string request_id = 1;
+
+  // The tenant on whose behalf this event is being submitted.
+  string tenant_id = 2;
+
+  // Identifies the source system (e.g., "SAP-S4HANA", "ORACLE-NETSUITE", "Custom-IoT-Platform").
+  string source_system = 3;
+
+  // --- Core Event Payload ---
+  SupplyChainEvent event = 4;
+}
+
+message IngestEventResponse {
+  // A unique identifier for the workflow instance that was started by this event.
+  string workflow_id = 1;
+
+  // Status of the ingestion. Should be "ACCEPTED_FOR_PROCESSING".
+  string status = 2;
+}
+
+// ===================================================================
+//  Core Data Structures for the Event
+// ===================================================================
+
+// SupplyChainEvent is the central message representing a single, auditable
+// event in the supply chain.
+message SupplyChainEvent {
+  // A unique identifier for this event within the source system.
+  string event_id = 1;
+
+  // The time the event occurred in the real world.
+  google.protobuf.Timestamp event_timestamp = 2;
+
+  // A controlled vocabulary of event types.
+  EventType event_type = 3;
+
+  // The primary asset or product this event pertains to.
+  Asset asset = 4;
+
+  // The location where the event took place.
+  Location location = 5;
+
+  // A list of all parties (suppliers, carriers, etc.) involved in this event.
+  repeated Actor actors = 6;
+
+  // A flexible field for any other business-specific data (e.g., purchase order details,
+  // quality control readings). This is where custom data from an ERP would go.
+  // It maps directly to a JSON object.
+  google.protobuf.Struct business_data = 7;
+
+  // An optional digital signature of the event payload to ensure non-repudiation.
+  // (e.g., HMAC-SHA256 of the serialized payload).
+  bytes signature = 8;
+}
+
+// An enumeration of possible event types.
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+
+  // Manufacturing & Production
+  EVENT_TYPE_MANUFACTURING_BATCH_CREATED = 10;
+  EVENT_TYPE_QUALITY_ASSURANCE_PASSED = 11;
+  EVENT_TYPE_QUALITY_ASSURANCE_FAILED = 12;
+
+  // Logistics & Transportation
+  EVENT_TYPE_SHIPMENT_CREATED = 20;
+  EVENT_TYPE_SHIPMENT_IN_TRANSIT = 21;
+  EVENT_TYPE_SHIPMENT_DELIVERED = 22;
+  EVENT_TYPE_SHIPMENT_DELAYED = 23;
+
+  // Supplier & Compliance
+  EVENT_TYPE_SUPPLIER_AUDIT_SCHEDULED = 30;
+  EVENT_TYPE_SUPPLIER_AUDIT_COMPLETED = 31;
+  EVENT_TYPE_SUPPLIER_AUDIT_FAILED = 32;
+
+  // Customs & Regulatory
+  EVENT_TYPE_CUSTOMS_CLEARED = 40;
+  EVENT_TYPE_CUSTOMS_INSPECTION_HOLD = 41;
+}
+
+// An Asset represents the physical or digital good being tracked.
+message Asset {
+  string asset_id = 1; // e.g., a serial number, pallet ID, or container ID.
+  string product_code = 2; // e.g., SKU, UPC.
+  string product_name = 3;
+  string batch_or_lot_number = 4;
+  string origin_country_code = 5; // ISO 3166-1 alpha-2
+}
+
+// An Actor represents a company or entity involved in the event.
+message Actor {
+  string actor_id = 1; // The unique ID for this actor in the customer's system.
+  string role = 2; // e.g., "SUPPLIER", "MANUFACTURER", "LOGISTICS_PROVIDER", "CUSTOMS_BROKER".
+  string name = 3;
+}
+
+// A Location represents a geographical point or facility.
+message Location {
+  // Could be a UN/LOCODE, a facility code, or just a country/city.
+  string location_id = 1;
+  string country_code = 2; // ISO 3166-1 alpha-2
+  string city = 3;
+  // Optional GPS coordinates for more precise tracking.
+  double latitude = 4;
+  double longitude = 5;
+}

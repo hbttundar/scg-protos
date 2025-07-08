@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package scg.v1.services.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/SupplyChainGuard/scg-protos/protoc-gen/go/v1/services;services";
+
+// ReportingService provides endpoints for generating compliance reports.
+service ReportingService {
+  // GenerateComplianceReport is the core flexible RPC for generating a report for any given date range.
+  // The specific monthly/annual RPCs are convenience wrappers around this one.
+  rpc GenerateComplianceReport(GenerateComplianceReportRequest) returns (GenerateComplianceReportResponse);
+
+  // --- Convenience Wrappers ---
+
+  // GenerateAnnualReport creates a report for a full calendar year.
+  rpc GenerateAnnualReport(GenerateAnnualReportRequest) returns (GenerateAnnualReportResponse);
+
+  // GenerateMonthlyReport creates a report for a specific month of a specific year.
+  rpc GenerateMonthlyReport(GenerateMonthlyReportRequest) returns (GenerateMonthlyReportResponse);
+}
+
+// The core request message for generating a report for a custom date range.
+message GenerateComplianceReportRequest {
+  string tenant_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+  string report_title = 4;
+}
+
+// Request for a full calendar year report.
+message GenerateAnnualReportRequest {
+  string tenant_id = 1;
+  int32 year = 2;
+}
+
+// Request for a specific month's report.
+message GenerateMonthlyReportRequest {
+  string tenant_id = 1;
+  int32 year = 2;
+  int32 month = 3; // 1 = January, 12 = December
+}
+
+// The standard response for the GenerateComplianceReport RPC.
+message GenerateComplianceReportResponse {
+  string report_download_url = 1;
+  string report_id = 2;
+}
+
+// The response for the GenerateAnnualReport RPC.
+message GenerateAnnualReportResponse {
+  string report_download_url = 1;
+  string report_id = 2;
+}
+
+// The response for the GenerateMonthlyReport RPC.
+message GenerateMonthlyReportResponse {
+  string report_download_url = 1;
+  string report_id = 2;
+}

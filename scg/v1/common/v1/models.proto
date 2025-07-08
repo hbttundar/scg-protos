@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package scg.v1.common.v1;
+
+// Defines the Go package path for the generated code.
+option go_package = "github.com/SupplyChainGuard/scg-protos/gen/go/v1/common;common";
+
+// Represents a real-time event from a customer's system.
+message EventData {
+  string event_id = 1;
+  string event_type = 2; // e.g., 'SHIPMENT_DEPARTED', 'SUPPLIER_AUDIT_FAILED'
+  string timestamp = 3;  // ISO 8601 format
+  string asset_id = 4;
+  string supplier_id = 5;
+  map<string, string> metadata = 6;
+}
+
+// The complete risk assessment output from the SCG-RiskAdvisor AI agent.
+message RiskAssessment {
+  string assessment_id = 1;
+  string event_id = 2;
+  double risk_score = 3;    // A value between 0.0 and 1.0
+  double confidence = 4;    // AI's confidence in its assessment
+  string summary = 5;       // Human-readable summary
+  repeated StructuredEvidence structured_evidence = 6; // Machine-parsable evidence list
+}
+
+// The structured evidence of a risk, as determined by the AI.
+message StructuredEvidence {
+  // LkSG-specific risk categories.
+  enum LkSGRiskCategory {
+    LK_SG_RISK_CATEGORY_UNSPECIFIED = 0;
+    LK_SG_RISK_CATEGORY_CHILD_LABOR = 1;
+    LK_SG_RISK_CATEGORY_FORCED_LABOR = 2;
+    LK_SG_RISK_CATEGORY_WORKPLACE_SAFETY = 3;
+    LK_SG_RISK_CATEGORY_DISCRIMINATION = 4;
+    LK_SG_RISK_CATEGORY_UNLAWFUL_EVICTION = 5;
+    LK_SG_RISK_CATEGORY_ENVIRONMENTAL_DAMAGE = 6;
+  }
+
+  LkSGRiskCategory evidence_type = 1;
+  string justification = 2;
+}

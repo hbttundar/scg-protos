@@ -1,0 +1,42 @@
+name: CI for scg-protos
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate-protos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Buf
+        uses: bufbuild/buf-setup-action@v1
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.4'
+
+      - name: Install protoc plugins
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+      - name: Lint Protobuf files
+        run: buf lint
+
+      - name: Check for breaking changes
+        run: buf breaking --against ".git#branch=main"
+
+      - name: Generate Go code
+        # Now we just run buf generate
+        run: buf generate
+
+      # ... (The rest of the script for checking for uncommitted changes remains the same) ...

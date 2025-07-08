@@ -1,0 +1,12 @@
+version: v1
+plugins:
+  # This configures the standard Go plugin.
+  - plugin: go
+    out: protoc-gen/go
+    opt:
+      - paths=source_relative
+  # This configures the Go gRPC plugin.
+  - plugin: go-grpc
+    out: protoc-gen/go
+    opt:
+      - paths=source_relative

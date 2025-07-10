@@ -5,7 +5,7 @@ package scg.v1.services.v1;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto"; // For flexible, arbitrary JSON-like data.
 
-option go_package = "github.com/SupplyChainGuard/scg-protos/protoc-gen/go/v1/services;services";
+option go_package = "github.com/hbttundar/scg-protos/protoc-gen/go/v1/services;services";
 
 // IngestionService is the primary public-facing service for ingesting all
 // supply chain events into the SupplyChainGuard platform.

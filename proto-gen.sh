@@ -27,4 +27,4 @@ echo "INFO: Generating Go code..."
 # Run buf generate. It reads buf.yaml and buf.gen.yaml to perform the generation.
 buf generate
 
-echo "SUCCESS: Code generation complete. New code is in 'generated-code/go'."
+echo "SUCCESS: Code generation complete. New code is in 'protoc-gen/go'."

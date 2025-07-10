@@ -38,5 +38,3 @@ jobs:
       - name: Generate Go code
         # Now we just run buf generate
         run: buf generate
-
-      # ... (The rest of the script for checking for uncommitted changes remains the same) ...

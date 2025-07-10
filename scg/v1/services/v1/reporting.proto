@@ -4,7 +4,7 @@ package scg.v1.services.v1;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/SupplyChainGuard/scg-protos/protoc-gen/go/v1/services;services";
+option go_package = "github.com/hbttundar/scg-protos/protoc-gen/go/v1/services;services";
 
 // ReportingService provides endpoints for generating compliance reports.
 service ReportingService {

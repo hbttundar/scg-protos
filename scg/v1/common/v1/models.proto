@@ -3,7 +3,7 @@ syntax = "proto3";
 package scg.v1.common.v1;
 
 // Defines the Go package path for the generated code.
-option go_package = "github.com/SupplyChainGuard/scg-protos/gen/go/v1/common;common";
+option go_package = "github.com/hbttundar/scg-protos/protoc-gen/go/v1/common;common";
 
 // Represents a real-time event from a customer's system.
 message EventData {
